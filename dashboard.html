@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prospect Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <style>
+        :root {
+            --bg-color: #f7f8fa;
+            --card-bg-color: #ffffff;
+            --primary-text-color: #202124;
+            --secondary-text-color: #5f6368;
+            --border-color: #e0e0e0;
+            --accent-color: #4285f4;
+            --font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--primary-text-color);
+            margin: 0;
+            padding: 32px;
+        }
+
+        .dashboard-header {
+            max-width: 1200px;
+            margin: 0 auto 32px auto;
+            background-color: var(--card-bg-color);
+            padding: 16px 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-header h1 {
+            color: var(--primary-text-color);
+            margin: 0;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .filters {
+            display: flex;
+            gap: 16px;
+        }
+
+        .filters input, .filters select {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            font-family: var(--font-family);
+            font-size: 14px;
+            background-color: #f1f3f4;
+        }
+        
+        #prospect-container {
+            max-width: 1200px;
+            margin: auto;
+            display: grid;
+            gap: 32px;
+        }
+
+        .prospect-card {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+        }
+
+        .card-main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 24px;
+            margin-bottom: 24px;
+        }
+        .card-main-header .company-title h2 {
+            margin: 0;
+            font-size: 1.75em;
+            font-weight: 600;
+        }
+        .card-main-header .company-title p {
+            margin: 4px 0 0 0;
+            color: var(--secondary-text-color);
+            font-size: 1em;
+        }
+        .tier-tag {
+            background-color: #e3f2fd;
+            color: #1967d2;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.8em;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .kpi-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .kpi-box {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .kpi-box .label {
+            color: var(--secondary-text-color);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        .kpi-box .value {
+            font-size: 2.25em;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        .kpi-box .sub-value {
+            color: var(--secondary-text-color);
+            font-size: 0.8em;
+            margin-top: 4px;
+        }
+        .market-share-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            padding: 24px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .info-column h3 {
+            font-size: 1em;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+            color: var(--primary-text-color);
+        }
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        .info-item i {
+            font-size: 1.1em;
+            color: var(--secondary-text-color);
+            width: 24px;
+            margin-top: 2px;
+        }
+        .info-item .info-content .label {
+            font-size: 0.9em;
+            color: var(--secondary-text-color);
+        }
+        .info-item .info-content .value {
+            font-size: 1em;
+        }
+        .info-item a { color: var(--accent-color); text-decoration: none; }
+        .info-item a:hover { text-decoration: underline; }
+
+        .status-tag {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .status-negotation { background-color: #e6f4ea; color: #1e8e3e; }
+        .status-warm { background-color: #feefc3; color: #f29900; }
+        .rating .fa-star { color: #fbbc04; }
+        .rating .fa-star-o { color: var(--border-color); }
+
+        .products-section {
+            padding-top: 24px;
+        }
+        .products-section h3 {
+            font-size: 1em;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+        }
+        .products-section p {
+            margin: 0;
+            color: var(--secondary-text-color);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-header">
+        <h1>Prospect Dashboard</h1>
+        <div class="filters">
+            <input type="text" id="company-filter" placeholder="Filter by company...">
+            <select id="stage-filter">
+                <option value="">All Stages</option>
+            </select>
+            <select id="status-filter">
+                <option value="">All Statuses</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="prospect-container">
+        <!-- Prospect cards will be generated here -->
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('prospect-container');
+        const companyFilter = document.getElementById('company-filter');
+        const stageFilter = document.getElementById('stage-filter');
+        const statusFilter = document.getElementById('status-filter');
+
+        const jsonData = {
+  "metadata": {
+    "source_file": "tier2_qualified_prospects.xlsx",
+    "rows": 16,
+    "columns": [
+      "company",
+      "ruc",
+      "city",
+      "district",
+      "country",
+      "tier",
+      "value_range",
+      "total_position",
+      "tier2_position",
+      "import_value",
+      "market_share",
+      "imported_products",
+      "last_import_date",
+      "company_website",
+      "company_linkedin",
+      "company_social_media",
+      "company_phone",
+      "contact1_name",
+      "contact1_position",
+      "contact1_linkedin",
+      "contact1_email",
+      "contact1_phone",
+      "contact2_name",
+      "email_ceo",
+      "contact2_position",
+      "contact2_linkedin",
+      "initial_outreach_date",
+      "last_contact_date",
+      "pipeline_stage",
+      "interest_level",
+      "interest_level_#",
+      "reason",
+      "next_actions",
+      "notes"
+    ],
+    "generated": "2025-08-23 14:40:51"
+  },
+  "data": [
+    {
+      "company": "Consorcio Agroindustria Alto Frut  S.A.C",
+      "ruc": "RUC20512922865",
+      "city": "Lima",
+      "district": "Chorrillos",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#13",
+      "tier2_position": "#1",
+      "import_value": 741592.9199999999,
+      "market_share": 0.008376537500011418,
+      "imported_products": "cinnamon, coriander, cumin, anise, pepper, paprika",
+      "last_import_date": "2025-04-04",
+      "company_website": NaN,
+      "company_linkedin": NaN,
+      "company_social_media": "https://www.facebook.com/afrutsac/",
+      "company_phone": "p:+5115680279",
+      "contact1_name": "Puchuri Diaz Roberto",
+      "contact1_position": "ceo",
+      "contact1_linkedin": NaN,
+      "contact1_email": NaN,
+      "contact1_phone": NaN,
+      "contact2_name": NaN,
+      "email_ceo": NaN,
+      "contact2_position": NaN,
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-15",
+      "pipeline_stage": "negotation",
+      "interest_level": "warm",
+      "interest_level_#": 2,
+      "reason": "Interested – Requesting Pricing",
+      "next_actions": "follow-up - call next week",
+      "notes": NaN
+    },
+    {
+      "company": "Premium Brands S.A.C",
+      "ruc": "RUC20515112554",
+      "city": "Lima",
+      "district": "Lurin",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#18",
+      "tier2_position": "#3",
+      "import_value": 569743.8199999998,
+      "market_share": 0.006435445033145346,
+      "imported_products": "coffee",
+      "last_import_date": "2025-04-30",
+      "company_website": "premiumbrands.pe",
+      "company_linkedin": NaN,
+      "company_social_media": NaN,
+      "company_phone": "p:+5114199100",
+      "contact1_name": "Locau Lio Carlos Cesar",
+      "contact1_position": "Partner",
+      "contact1_linkedin": NaN,
+      "contact1_email": NaN,
+      "contact1_phone": NaN,
+      "contact2_name": NaN,
+      "email_ceo": NaN,
+      "contact2_position": NaN,
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-22",
+      "pipeline_stage": "engaged",
+      "interest_level": "warm",
+      "interest_level_#": 2,
+      "reason": "Interested – Requesting More Info",
+      "next_actions": "nurture campaign",
+      "notes": NaN
+    },
+    {
+      "company": "Panuts Vinos Memorables S.A.C",
+      "ruc": "RUC20263512945",
+      "city": "Lima",
+      "district": "Miraflores",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#37",
+      "tier2_position": "#15",
+      "import_value": 278992.14,
+      "market_share": 0.003151308568208062,
+      "imported_products": "coffee",
+      "last_import_date": "2025-03-24",
+      "company_website": "panuts.com",
+      "company_linkedin": NaN,
+      "company_social_media": NaN,
+      "company_phone": "p:+5112718808",
+      "contact1_name": "Cespedes Alvarez Julio Martin",
+      "contact1_position": "Partner",
+      "contact1_linkedin": NaN,
+      "contact1_email": NaN,
+      "contact1_phone": NaN,
+      "contact2_name": NaN,
+      "email_ceo": NaN,
+      "contact2_position": NaN,
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-22",
+      "pipeline_stage": "engaged",
+      "interest_level": "warm",
+      "interest_level_#": 2,
+      "reason": "Interested – Requesting More Info",
+      "next_actions": "nurture campaign",
+      "notes": NaN
+    },
+    {
+      "company": "Fructus Terrum S.A",
+      "ruc": "RUC20471988368",
+      "city": "Lima",
+      "district": "Chorrillos",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#39",
+      "tier2_position": "#17",
+      "import_value": 269151.56,
+      "market_share": 0.003040155959858103,
+      "imported_products": "cinnamon, coriander, cumin, anise, ginger, turmeric, saffron, laurel, curry, pepper, paprika",
+      "last_import_date": "2025-04-21",
+      "company_website": "fructusterrum.com",
+      "company_linkedin": "https://www.linkedin.com/company/fructus-terrum-s-a-/",
+      "company_social_media": NaN,
+      "company_phone": "p:+5112521276",
+      "contact1_name": "Dante Casafranca",
+      "contact1_position": "purchase manager",
+      "contact1_linkedin": "https://www.linkedin.com/in/dante-casafranca-velarde-1826a664/",
+      "contact1_email": "dcasafranca@fructusterrum.com",
+      "contact1_phone": "p:+511 252 1276",
+      "contact2_name": "Miguel Armejo",
+      "email_ceo": "marmejo@fructusterrum.com",
+      "contact2_position": "ceo",
+      "contact2_linkedin": "https://www.linkedin.com/in/miguel-%C3%A1ngel-armejo-y%C3%A9pez-7a755664/",
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-22",
+      "pipeline_stage": "contacted",
+      "interest_level": "warm",
+      "interest_level_#": 2,
+      "reason": "interested",
+      "next_actions": "nurture campaign",
+      "notes": NaN
+    },
+    {
+      "company": "Corporacion H.A. Islcaya Empresa Individual De Responsabilidad Limitada - Corporacion H.A. Islcaya E",
+      "ruc": "RUC20538653218",
+      "city": "Lima",
+      "district": "La Victoria",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#19",
+      "tier2_position": "#4",
+      "import_value": 487683.69,
+      "market_share": 0.005508548702742393,
+      "imported_products": "cinnamon, cloves, coriander, cumin, anise",
+      "last_import_date": "2025-04-26",
+      "company_website": NaN,
+      "company_linkedin": NaN,
+      "company_social_media": "https://www.facebook.com/p/Corporaci%C3%B3n-HA-Islcaya-100064672512975/",
+      "company_phone": "p:+5113251155",
+      "contact1_name": "Yony Cabrera",
+      "contact1_position": "ceo",
+      "contact1_linkedin": NaN,
+      "contact1_email": "islcayaha.peru@gmail.com",
+      "contact1_phone": "p: +51 946 334 418",
+      "contact2_name": NaN,
+      "email_ceo": NaN,
+      "contact2_position": NaN,
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-21",
+      "pipeline_stage": "contacted",
+      "interest_level": "cold",
+      "interest_level_#": 1,
+      "reason": "No Reply – 14 Days",
+      "next_actions": "nurture campaign",
+      "notes": NaN
+    },
+    {
+      "company": "Frutos Huanchi Export S.A.C",
+      "ruc": "RUC20611346213",
+      "city": "Lima",
+      "district": "La Victoria",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#21",
+      "tier2_position": "#6",
+      "import_value": 474543.0,
+      "market_share": 0.0053601202595999955,
+      "imported_products": "cinnamon",
+      "last_import_date": "2025-03-04",
+      "company_website": NaN,
+      "company_linkedin": NaN,
+      "company_social_media": NaN,
+      "company_phone": "m:+51935 148 091",
+      "contact1_name": "Sergio Huanchi",
+      "contact1_position": "ceo",
+      "contact1_linkedin": NaN,
+      "contact1_email": NaN,
+      "contact1_phone": NaN,
+      "contact2_name": NaN,
+      "email_ceo": NaN,
+      "contact2_position": NaN,
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-21",
+      "pipeline_stage": "contacted",
+      "interest_level": "cold",
+      "interest_level_#": 1,
+      "reason": "No Reply – 14 Days",
+      "next_actions": "nurture campaign",
+      "notes": NaN
+    },
+    {
+      "company": "Consorcio Glm S.A.C",
+      "ruc": "RUC20517160432",
+      "city": "Lima",
+      "district": "Lurin",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#26",
+      "tier2_position": "#8",
+      "import_value": 376704.7799999999,
+      "market_share": 0.004255005180070423,
+      "imported_products": "cinnamon, cloves, coriander, cumin, anise, ginger, turmeric, saffron, laurel, curry, nutmeg, pepper, paprika",
+      "last_import_date": "2025-04-22",
+      "company_website": "glmfoods.com",
+      "company_linkedin": "https://www.linkedin.com/company/glm-foods/",
+      "company_social_media": NaN,
+      "company_phone": NaN,
+      "contact1_name": "Jenny Arqque",
+      "contact1_position": "operation manager",
+      "contact1_linkedin": "https://www.linkedin.com/in/jenny-milagros-arqque-curse-086562129/",
+      "contact1_email": NaN,
+      "contact1_phone": "p:+511 2613134",
+      "contact2_name": "Molina Sarmiento Rina Solans",
+      "email_ceo": NaN,
+      "contact2_position": "ceo",
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-21",
+      "pipeline_stage": "contacted",
+      "interest_level": "cold",
+      "interest_level_#": 1,
+      "reason": "No Reply – 14 Days",
+      "next_actions": "nurture campaign",
+      "notes": NaN
+    },
+    {
+      "company": "Corporacion Aromas Sur E.I.R.L",
+      "ruc": "RUC20555801891",
+      "city": "Lima",
+      "district": "La Victoria",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#27",
+      "tier2_position": "#9",
+      "import_value": 369305.54000000004,
+      "market_share": 0.004171428315108466,
+      "imported_products": "cinnamon",
+      "last_import_date": "2025-01-03",
+      "company_website": NaN,
+      "company_linkedin": NaN,
+      "company_social_media": "https://www.facebook.com/corp.aromassur/",
+      "company_phone": NaN,
+      "contact1_name": "Yola Cabrera",
+      "contact1_position": "ceo",
+      "contact1_linkedin": NaN,
+      "contact1_email": "yoly_fn2906@hotmail.com",
+      "contact1_phone": "p: +51 969 620 068",
+      "contact2_name": NaN,
+      "email_ceo": NaN,
+      "contact2_position": NaN,
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-21",
+      "pipeline_stage": "contacted",
+      "interest_level": "cold",
+      "interest_level_#": 1,
+      "reason": "No Reply – 14 Days",
+      "next_actions": "nurture campaign",
+      "notes": NaN
+    },
+    {
+      "company": "Industria H.E. S.A.C",
+      "ruc": "RUC20507294350",
+      "city": "Lima",
+      "district": "Ate",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#28",
+      "tier2_position": "#10",
+      "import__value": 354328.57999999996,
+      "market_share": 0.004002258594507342,
+      "imported_products": "cinnamon, coriander, cumin, anise, tea",
+      "last_import_date": "2025-04-12",
+      "company_website": NaN,
+      "company_linkedin": NaN,
+      "company_social_media": NaN,
+      "company_phone": "p:+5113513432",
+      "contact1_name": "Martinez Pocomucha Susana Carol",
+      "contact1_position": "ceo",
+      "contact1_linkedin": NaN,
+      "contact1_email": NaN,
+      "contact1_phone": NaN,
+      "contact2_name": NaN,
+      "email_ceo": NaN,
+      "contact2_position": NaN,
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-21",
+      "pipeline_stage": "contacted",
+      "interest_level": "cold",
+      "interest_level_#": 1,
+      "reason": "No Reply – 14 Days",
+      "next_actions": "nurture campaign",
+      "notes": NaN
+    },
+    {
+      "company": "Frutos & Aromaticos Del Peru S.A.C.",
+      "ruc": "RUC20550035210",
+      "city": "Lima",
+      "district": "La Victoria",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#35",
+      "tier2_position": "#13",
+      "import_value": 286407.39,
+      "market_share": 0.0032350662714193596,
+      "imported_products": "cinnamon, cloves, coriander, cumin, anise",
+      "last_import_date": "2025-01-14",
+      "company_website": NaN,
+      "company_linkedin": NaN,
+      "company_social_media": "https://www.facebook.com/p/Frutos-Arom%C3%A1ticos-del-Per%C3%BA-100076297177004/",
+      "company_phone": "p:+5114233043",
+      "contact1_name": "Cabrera Coarita Roberto",
+      "contact1_position": "ceo",
+      "contact1_linkedin": NaN,
+      "contact1_email": NaN,
+      "contact1_phone": NaN,
+      "contact2_name": NaN,
+      "email_ceo": NaN,
+      "contact2_position": NaN,
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-20",
+      "pipeline_stage": "contacted",
+      "interest_level": "cold",
+      "interest_level_#": 1,
+      "reason": "No Reply – 14 Days",
+      "next_actions": "nurture campaign",
+      "notes": NaN
+    },
+    {
+      "company": "Grupo Savea S.A.C",
+      "ruc": "RUC20525407714",
+      "city": "Piura",
+      "district": "Piura",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#40",
+      "tier2_position": "#18",
+      "import_value": 268689.0,
+      "market_share": 0.0030349311915498977,
+      "imported_products": "cloves, coriander, cumin, anise",
+      "last_import_date": "2025-02-14",
+      "company_website": NaN,
+      "company_linkedin": NaN,
+      "company_social_media": NaN,
+      "company_phone": "p:+5173613589",
+      "contact1_name": "Adalberto Flores Berru",
+      "contact1_position": NaN,
+      "contact1_linkedin": NaN,
+      "contact1_email": "adalberto_floresb@hotmail.com",
+      "contact1_phone": NaN,
+      "contact2_name": NaN,
+      "email_ceo": NaN,
+      "contact2_position": NaN,
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-20",
+      "pipeline_stage": "contacted",
+      "interest_level": "cold",
+      "interest_level_#": 1,
+      "reason": "No Reply – 14 Days",
+      "next_actions": "nurture campaign",
+      "notes": NaN
+    },
+    {
+      "company": "Emco Granos,  S.C.R.L",
+      "ruc": "RUC20603063831",
+      "city": "Puno",
+      "district": "Desaguadero",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#34",
+      "tier2_position": "#12",
+      "import_value": 288398.0,
+      "market_share": 0.0032575508702649063,
+      "imported_products": "cloves, coriander, cumin, anise",
+      "last_import_date": "2024-10-29",
+      "company_website": NaN,
+      "company_linkedin": NaN,
+      "company_social_media": NaN,
+      "company_phone": NaN,
+      "contact1_name": "Quispe Castro Alex",
+      "contact1_position": "ceo",
+      "contact1_linkedin": NaN,
+      "contact1_email": NaN,
+      "contact1_phone": NaN,
+      "contact2_name": NaN,
+      "email_ceo": NaN,
+      "contact2_position": NaN,
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": NaN,
+      "last_contact_date": NaN,
+      "pipeline_stage": "disqualified",
+      "interest_level": "disqualified",
+      "interest_level_#": 0,
+      "reason": "No Contact Information Found",
+      "next_actions": NaN,
+      "notes": NaN
+    },
+    {
+      "company": "Inversiones Gronay Sociedad Anonima Cerrada - Inversiones Gronay S.A.C",
+      "ruc": "RUC20605597981",
+      "city": "Lima",
+      "district": "La Victoria",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#38",
+      "tier2_position": "#16",
+      "import_value": 269566.99,
+      "market_share": 0.0030448483792161916,
+      "imported_products": "coriander, cumin, anise",
+      "last_import_date": "2024-12-11",
+      "company_website": NaN,
+      "company_linkedin": NaN,
+      "company_social_media": "https://www.facebook.com/p/Inversiones-gronay-sac-100069379953954/",
+      "company_phone": NaN,
+      "contact1_name": "Machaca Llanque Grover",
+      "contact1_position": "ceo",
+      "contact1_linkedin": NaN,
+      "contact1_email": NaN,
+      "contact1_phone": NaN,
+      "contact2_name": NaN,
+      "email_ceo": NaN,
+      "contact2_position": NaN,
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": NaN,
+      "last_contact_date": NaN,
+      "pipeline_stage": "disqualified",
+      "interest_level": "disqualified",
+      "interest_level_#": 0,
+      "reason": "No Contact Information Found",
+      "next_actions": NaN,
+      "notes": NaN
+    },
+    {
+      "company": "Ich Corp S.A",
+      "ruc": "RUC20132515680",
+      "city": "Lima",
+      "district": "Villa El Salvador",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#15",
+      "tier2_position": "#2",
+      "import_value": 688964.4299999999,
+      "market_share": 0.007782081285335075,
+      "imported_products": "pepper, paprika",
+      "last_import_date": "2024-02-19",
+      "company_website": "ich.com.pe",
+      "company_linkedin": "https://www.linkedin.com/company/ich-corp/",
+      "company_social_media": NaN,
+      "company_phone": "p:+5115144454",
+      "contact1_name": "Anette Concha",
+      "contact1_position": "commercial manager",
+      "contact1_linkedin": "https://www.linkedin.com/in/anette-concha-holguin-98a21031/",
+      "contact1_email": "aconcha@ich.com.pe",
+      "contact1_phone": NaN,
+      "contact2_name": "Julio Concha Holguin",
+      "email_ceo": NaN,
+      "contact2_position": "ceo",
+      "contact2_linkedin": "https://www.linkedin.com/in/juliocesarconchaholguin/",
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-20",
+      "pipeline_stage": "disqualified",
+      "interest_level": "disqualified",
+      "interest_level_#": 0,
+      "reason": "Not Interested – Timing",
+      "next_actions": NaN,
+      "notes": NaN
+    },
+    {
+      "company": "Importaciones Grafruts Y Sara Empresa Individual De Responsabilidad Limitada",
+      "ruc": "RUC20607936821",
+      "city": NaN,
+      "district": NaN,
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#25",
+      "tier2_position": "#7",
+      "import_value": 383423.75,
+      "market_share": 0.00433089817021177,
+      "imported_products": "cinnamon, cloves, coriander, cumin, anise",
+      "last_import_date": "2024-12-23",
+      "company_website": NaN,
+      "company_linkedin": NaN,
+      "company_social_media": NaN,
+      "company_phone": NaN,
+      "contact1_name": "Choque Betty Mercedes",
+      "contact1_position": "ceo",
+      "contact1_linkedin": NaN,
+      "contact1_email": NaN,
+      "contact1_phone": NaN,
+      "contact2_name": NaN,
+      "email_ceo": NaN,
+      "contact2_position": NaN,
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": NaN,
+      "last_contact_date": NaN,
+      "pipeline_stage": "disqualified",
+      "interest_level": "disqualified",
+      "interest_level_#": 0,
+      "reason": "No Contact Information Found",
+      "next_actions": NaN,
+      "notes": NaN
+    },
+    {
+      "company": "Consorcio Valle La Frut S.A.C",
+      "ruc": "RUC20508817500",
+      "city": "Lima",
+      "district": "La Victoria",
+      "country": "Peru",
+      "tier": "Tier 2: Growth Partners",
+      "value_range": "Between $250K - $1M",
+      "total_position": "#36",
+      "tier2_position": "#14",
+      "import_value": 283147.49,
+      "market_share": 0.0031982446218865035,
+      "imported_products": "cloves, coriander, cumin, anise, ginger, turmeric, saffron, laurel, curry",
+      "last_import_date": "2024-04-15",
+      "company_website": NaN,
+      "company_linkedin": NaN,
+      "company_social_media": "https://www.facebook.com/afrutsac/",
+      "company_phone": "p:+5115680279",
+      "contact1_name": "Yaneth Ermelinda",
+      "contact1_position": NaN,
+      "contact1_linkedin": NaN,
+      "contact1_email": "yanethermelinda3@gmail.com",
+      "contact1_phone": "p: +51 948 951 643",
+      "contact2_name": "Puchuri Diaz Elmore",
+      "email_ceo": NaN,
+      "contact2_position": "ceo",
+      "contact2_linkedin": NaN,
+      "initial_outreach_date": "2025-08-08",
+      "last_contact_date": "2025-08-16",
+      "pipeline_stage": "disqualified",
+      "interest_level": "disqualified",
+      "interest_level_#": 0,
+      "reason": "Replaced by Another Company",
+      "next_actions": NaN,
+      "notes": NaN
+    }
+  ]
+}
+        let prospects = jsonData.data;
+
+        function formatValue(value, fallback = 'N/A') {
+            if (value === null || typeof value === 'undefined' || value === 'NaN' || value === '') {
+                return fallback;
+            }
+            return value;
+        }
+
+        function renderProspects(data) {
+            container.innerHTML = '';
+            populateFilters(prospects); // Use the full dataset to populate filters
+
+            data.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'prospect-card';
+
+                const marketShare = parseFloat(p.market_share) * 100;
+                const circleGradient = `conic-gradient(var(--accent-color) ${marketShare * 3.6}deg, var(--border-color) 0deg)`;
+
+                card.innerHTML = `
+                    <div class="card-main-header">
+                        <div class="company-title">
+                            <h2>${formatValue(p.company)}</h2>
+                            <p>${formatValue(p.ruc)}</p>
+                        </div>
+                        <div class="tier-tag">${formatValue(p.tier)}</div>
+                    </div>
+
+                    <div class="kpi-section">
+                        <div class="kpi-box">
+                            <div class="label">Import Value (USD)</div>
+                            <div class="value">$${Math.round(p.import_value).toLocaleString('en-US')}</div>
+                            <div class="sub-value">${formatValue(p.value_range)}</div>
+                        </div>
+                        <div class="kpi-box">
+                            <div class="label">Market Share</div>
+                            <div class="market-share-circle" style="background: ${circleGradient};">
+                                ${marketShare.toFixed(2)}%
+                            </div>
+                        </div>
+                        <div class="kpi-box">
+                            <div class="label">Market Position</div>
+                            <div class="value">${formatValue(p.tier2_position)}</div>
+                            <div class="sub-value">Overall: ${formatValue(p.total_position)}</div>
+                        </div>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-column">
+                            <h3>Company Information</h3>
+                            <div class="info-item"><i class="fas fa-map-marker-alt"></i><div class="info-content"><div class="label">Location</div><div class="value">${formatValue(p.district)}, ${formatValue(p.city)}</div></div></div>
+                            <div class="info-item"><i class="fas fa-globe"></i><div class="info-content"><div class="label">Website</div><div class="value"><a href="http://${p.company_website}" target="_blank">${formatValue(p.company_website)}</a></div></div></div>
+                            <div class="info-item"><i class="fas fa-phone"></i><div class="info-content"><div class="label">Company Phone</div><div class="value">${formatValue(p.company_phone)}</div></div></div>
+                        </div>
+                        <div class="info-column">
+                            <h3>Primary Contact</h3>
+                            <div class="info-item"><i class="fas fa-user"></i><div class="info-content"><div class="label">Name</div><div class="value">${formatValue(p.contact1_name)}</div></div></div>
+                            <div class="info-item"><i class="fas fa-briefcase"></i><div class="info-content"><div class="label">Position</div><div class="value">${formatValue(p.contact1_position)}</div></div></div>
+                            <div class="info-item"><i class="fas fa-mobile-alt"></i><div class="info-content"><div class="label">Phone</div><div class="value">${formatValue(p.contact1_phone)}</div></div></div>
+                        </div>
+                        <div class="info-column">
+                            <h3>Pipeline Status</h3>
+                            <div class="info-item"><i class="fas fa-flag"></i><div class="info-content"><div class="label">Stage</div><div class="value"><span class="status-tag status-${p.pipeline_stage}">${formatValue(p.pipeline_stage)}</span></div></div></div>
+                            <div class="info-item"><i class="fas fa-fire"></i><div class="info-content"><div class="label">Interest</div><div class="value"><span class="status-tag status-${p.interest_level}">${formatValue(p.interest_level)}</span></div></div></div>
+                            <div class="info-item"><i class="fas fa-calendar-check"></i><div class="info-content"><div class="label">Next Actions</div><div class="value">${formatValue(p.next_actions)}</div></div></div>
+                        </div>
+                    </div>
+
+                    <div class="products-section">
+                        <h3>Imported Products</h3>
+                        <p>${formatValue(p.imported_products)}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function populateFilters(data) {
+            const stages = [...new Set(data.map(p => p.pipeline_stage).filter(Boolean))];
+            const statuses = [...new Set(data.map(p => p.interest_level).filter(Boolean))];
+
+            // Clear existing options before populating
+            stageFilter.innerHTML = '<option value="">All Stages</option>';
+            statusFilter.innerHTML = '<option value="">All Statuses</option>';
+
+            stages.forEach(stage => {
+                const option = document.createElement('option');
+                option.value = stage;
+                option.textContent = stage.charAt(0).toUpperCase() + stage.slice(1);
+                stageFilter.appendChild(option);
+            });
+
+            statuses.forEach(status => {
+                const option = document.createElement('option');
+                option.value = status;
+                option.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                statusFilter.appendChild(option);
+            });
+        }
+
+        function filterAndRender() {
+            let filteredProspects = prospects;
+
+            const companyQuery = companyFilter.value.toLowerCase();
+            if (companyQuery) {
+                filteredProspects = filteredProspects.filter(p => p.company.toLowerCase().includes(companyQuery));
+            }
+
+            const stageQuery = stageFilter.value;
+            if (stageQuery) {
+                filteredProspects = filteredProspects.filter(p => p.pipeline_stage === stageQuery);
+            }
+
+            const statusQuery = statusFilter.value;
+            if (statusQuery) {
+                filteredProspects = filteredProspects.filter(p => p.interest_level === statusQuery);
+            }
+
+            renderProspects(filteredProspects);
+        }
+
+        companyFilter.addEventListener('input', filterAndRender);
+        stageFilter.addEventListener('change', filterAndRender);
+        statusFilter.addEventListener('change', filterAndRender);
+
+        // Initial render
+        renderProspects(prospects);
+    });
+    </script>
+
+</body>
+</html>
